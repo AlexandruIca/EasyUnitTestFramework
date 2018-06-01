@@ -1,17 +1,16 @@
 #include "EUTF.hpp"
 
+#include <iostream>
 #include <vector>
 #include <utility>
 
-namespace eutf 
-{
+namespace eutf {
+
 	std::vector<Test*> test_queue;
 	std::vector<std::string> name;
 	std::size_t warnings = 0;
 	std::size_t errors = 0;
 }
-
-std::ofstream* f = nullptr;
 
 eutf::Test::Test(Test* test, std::string&& name)
 	: m_name(std::move(name))
@@ -20,11 +19,6 @@ eutf::Test::Test(Test* test, std::string&& name)
 }
 
 eutf::Test::~Test() {}
-
-std::size_t eutf::TestsCount() 
-{
-	return eutf::test_queue.size();
-}
 
 std::string eutf::TestName()
 {
@@ -48,128 +42,87 @@ void eutf::DeleteTestName()
 	eutf::name.pop_back();
 }
 
-void eutf::RunAll(std::ofstream& f)
+static void RunTests(std::ostream& f)
 {
-	for (const auto& test : eutf::test_queue) {
+	std::size_t n = eutf::test_queue.size();
+
+	if(n == 1) {
+		f << "1 test" << std::endl;
+	}
+	else {
+		f << n << " tests" << std::endl;
+	}
+
+	for(const auto& test : eutf::test_queue) {
 		test->run();
 	}
 
-	f << '\n';
+	f << std::endl;
 
-	if (eutf::warnings)
+	if(eutf::warnings) {
 		f << "Warnings: " << eutf::warnings << std::endl;
-	else
-		f << "***No warnings" << std::endl;
-	if (eutf::errors)
-		f << "Failures: " << eutf::errors << std::endl;
-	else
-		f << "***No failures" << std::endl;
-}
-
-void eutf::RunAll(std::ostream& f)
-{
-	for (const auto& test : eutf::test_queue) {
-		test->run();
 	}
-
-	f << '\n';
-
-	if (eutf::warnings)
-		f << "Warnings: " << eutf::warnings << std::endl;
-	else
+	else {
 		f << "***No warnings" << std::endl;
-	if (eutf::errors)
-		f << "Failures: " << eutf::errors << std::endl;
-	else
-		f << "***No failures" << std::endl;
-}
-
-void eutf::RunAll(std::fstream& f)
-{
-	for (const auto& test : eutf::test_queue) {
-		test->run();
 	}
-
-	f << '\n';
-
-	if (eutf::warnings)
-		f << "Warnings: " << eutf::warnings << std::endl;
-	else
-		f << "***No warnings" << std::endl;
-	if (eutf::errors)
+	if(eutf::errors) {
 		f << "Failures: " << eutf::errors << std::endl;
-	else
+	}
+	else {
 		f << "***No failures" << std::endl;
+	}
 }
 
-template<typename T>
-static inline void LogType(T& f, const char* type, const std::string& name, const char* file, int line, const char* callstr)
+void eutf::RunAll(int log)
 {
-	f << file << "(" << line << ") " << eutf::TestName() << name << " [" << type << "]: " << callstr << std::endl;
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		RunTests(std::cout);
+		break;
+	}
+	}
 }
 
-void eutf::Test::OnFatal(std::ofstream& f, const char* file, int line, const char* callstr)
+void eutf::Test::OnFatal(int log, const char* file, int line, const char* callstr)
 {
-	LogType(f, "FATAL", this->m_name, file, line, callstr);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ") " << eutf::TestName() << this->m_name << " [FATAL]: " << callstr << std::endl;
+	}
+	}
 }
 
-void eutf::Test::OnFatal(std::ostream& f, const char* file, int line, const char* callstr)
-{
-	LogType(f, "FATAL", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnFatal(std::fstream& f, const char* file, int line, const char* callstr)
-{
-	LogType(f, "FATAL", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnFailure(std::ofstream& f, const char* file, int line, const char* callstr)
-{
-	++errors;
-	LogType(f, "FAILURE", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnFailure(std::ostream& f, const char* file, int line, const char* callstr)
+void eutf::Test::OnFailure(int log, const char* file, int line, const char* callstr)
 {
 	++errors;
-	LogType(f, "FAILURE", this->m_name, file, line, callstr);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ")" << eutf::TestName() << this->m_name << " [FAILURE]: " << callstr << std::endl;
+	}
+	}
 }
 
-void eutf::Test::OnFailure(std::fstream& f, const char* file, int line, const char* callstr)
-{
-	++errors;
-	LogType(f, "FAILURE", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnWarning(std::ofstream& f, const char* file, int line, const char* callstr)
-{
-	++warnings;
-	LogType(f, "WARINING", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnWarning(std::ostream& f, const char* file, int line, const char* callstr)
+void eutf::Test::OnWarning(int log, const char* file, int line, const char* callstr)
 {
 	++warnings;
-	LogType(f, "WARINING", this->m_name, file, line, callstr);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ")" << eutf::TestName() << this->m_name << " [WARNING]: " << callstr << std::endl;		
+        }
+	}
 }
 
-void eutf::Test::OnWarning(std::fstream& f, const char* file, int line, const char* callstr)
+void eutf::Test::OnMessage(int log, const char* file, int line, const char* msg)
 {
-	++warnings;
-	LogType(f, "WARINING", this->m_name, file, line, callstr);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ")" << eutf::TestName() << this->m_name << " [MESSAGE]: " << msg << std::endl;
+	}
+	}
 }
 
-void eutf::Test::OnMessage(std::ofstream& f, const char* file, int line, const char* msg)
-{
-	LogType(f, "MESSAGE", this->m_name, file, line, msg);
-}
-
-void eutf::Test::OnMessage(std::ostream& f, const char* file, int line, const char* msg)
-{
-	LogType(f, "MESSAGE", this->m_name, file, line, msg);
-}
-
-void eutf::Test::OnMessage(std::fstream& f, const char* file, int line, const char* msg)
-{
-	LogType(f, "MESSAGE", this->m_name, file, line, msg);
-}
