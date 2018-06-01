@@ -11,8 +11,6 @@ namespace eutf
 	std::size_t errors = 0;
 }
 
-std::ofstream* f = nullptr;
-
 eutf::Test::Test(Test* test, std::string&& name)
 	: m_name(std::move(name))
 {

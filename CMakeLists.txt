@@ -1,8 +1,7 @@
 cmake_minimum_required( VERSION 3.5 )
 
-project( EUTF )
+project( EUTF VERSION 1.0 )
 
-set( CMAKE_CXX_STANDARD 11 )
 set( EUTF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/ )
 set( EUTF_HEADER ${PROJECT_SOURCE_DIR}/src/EUTF.hpp )
 

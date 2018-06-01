@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 3.5 )
 
 project( EUTF_Usage )
 
+set( CMAKE_CXX_STANDARD 11 )
+
 #
 # Let's say we want to build the tests
 #
