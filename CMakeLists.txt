@@ -7,7 +7,6 @@ set( EUTF_HEADER ${PROJECT_SOURCE_DIR}/src/EUTF.hpp )
 
 if( EUTF_BUILD_TESTS )
 	add_subdirectory( ${PROJECT_SOURCE_DIR}/examples/simple_setup/ )
-	add_subdirectory( ${PROJECT_SOURCE_DIR}/examples/output_file/ )
 	add_subdirectory( ${PROJECT_SOURCE_DIR}/examples/tests_in_different_files/ )
 	add_subdirectory( ${PROJECT_SOURCE_DIR}/examples/one_line_test_suite/ )
 endif()
