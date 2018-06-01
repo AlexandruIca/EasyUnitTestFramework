@@ -43,7 +43,7 @@ The output of that should be something like this:
 path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) name of the test does not have to be a valid variable name [FAILURE]: 2 == 3
 path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) name of the test does not have to be a valid variable name [WARNING]: 2 == 3
 path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) name of the test does not have to be a valid variable name [MESSAGE]: this will be printed alongside the output that contains the results of the tests
-path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) name of the test doesn'tt have to be a valid variable name [FATAL]: 2 == 3
+path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) name of the test does not have to be a valid variable name [FATAL]: 2 == 3
 
 Warnings: 1
 Failures: 1
