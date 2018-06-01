@@ -85,5 +85,5 @@ Check examples/ for more.
 v1.0: 
 * Basic test organizers(test case, test suite)
 * Basic test helpers(assert, expect, check, message)
-* Option to save output to a seperate file
+* Option to save output to a seperate file(deprecated)
  
