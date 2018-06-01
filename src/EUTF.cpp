@@ -4,8 +4,7 @@
 #include <vector>
 #include <utility>
 
-namespace eutf 
-{
+namespace eutf {
 	std::vector<Test*> test_queue;
 	std::vector<std::string> name;
 	std::size_t warnings = 0;
