@@ -48,18 +48,6 @@ path/to/your/file.cpp(line at which a fatal error/error/warning/message occured)
 Warnings: 1
 Failures: 1
 ```
-To save the results to a different file:
-```c++
-#include <fstream>
-
-std::ofstream g{ "output.txt" };
-
-#define EUTF_LOG g
-#include "EUTF.hpp"
-
-// your tests
-
-```
 You can also have test suites which are a way to organize tests:
 ```c++
 #include "EUTF.hpp"
