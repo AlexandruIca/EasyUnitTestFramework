@@ -46,58 +46,51 @@ void eutf::DeleteTestName()
 	eutf::name.pop_back();
 }
 
-void eutf::RunAll(std::ofstream& f)
+template<typename T>
+static void RunTests(T& f)
 {
-	for (const auto& test : eutf::test_queue) {
+	std::size_t n = eutf::test_queue.size();
+
+	if(n == 1) {
+		f << "1 test" << std::endl;
+	}
+	else {
+		f << n << " tests" << std::endl;
+	}
+
+	for(const auto& test : eutf::test_queue) {
 		test->run();
 	}
 
-	f << '\n';
+	f << std::endl;
 
-	if (eutf::warnings)
+	if(eutf::warnings) {
 		f << "Warnings: " << eutf::warnings << std::endl;
-	else
+	}
+	else {
 		f << "***No warnings" << std::endl;
-	if (eutf::errors)
+	}
+	if(eutf::errors) {
 		f << "Failures: " << eutf::errors << std::endl;
-	else
+	}
+	else {
 		f << "***No failures" << std::endl;
+	}
+}
+
+void eutf::RunAll(std::ofstream& f)
+{
+	RunTests(f);
 }
 
 void eutf::RunAll(std::ostream& f)
 {
-	for (const auto& test : eutf::test_queue) {
-		test->run();
-	}
-
-	f << '\n';
-
-	if (eutf::warnings)
-		f << "Warnings: " << eutf::warnings << std::endl;
-	else
-		f << "***No warnings" << std::endl;
-	if (eutf::errors)
-		f << "Failures: " << eutf::errors << std::endl;
-	else
-		f << "***No failures" << std::endl;
+	RunTests(f);
 }
 
 void eutf::RunAll(std::fstream& f)
 {
-	for (const auto& test : eutf::test_queue) {
-		test->run();
-	}
-
-	f << '\n';
-
-	if (eutf::warnings)
-		f << "Warnings: " << eutf::warnings << std::endl;
-	else
-		f << "***No warnings" << std::endl;
-	if (eutf::errors)
-		f << "Failures: " << eutf::errors << std::endl;
-	else
-		f << "***No failures" << std::endl;
+	RunTests(f);
 }
 
 template<typename T>
@@ -171,3 +164,4 @@ void eutf::Test::OnMessage(std::fstream& f, const char* file, int line, const ch
 {
 	LogType(f, "MESSAGE", this->m_name, file, line, msg);
 }
+
