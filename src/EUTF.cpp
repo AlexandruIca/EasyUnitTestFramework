@@ -1,5 +1,6 @@
 #include "EUTF.hpp"
 
+#include <iostream>
 #include <vector>
 #include <utility>
 
@@ -18,11 +19,6 @@ eutf::Test::Test(Test* test, std::string&& name)
 }
 
 eutf::Test::~Test() {}
-
-std::size_t eutf::TestsCount() 
-{
-	return eutf::test_queue.size();
-}
 
 std::string eutf::TestName()
 {
@@ -46,8 +42,7 @@ void eutf::DeleteTestName()
 	eutf::name.pop_back();
 }
 
-template<typename T>
-static void RunTests(T& f)
+static void RunTests(std::ostream& f)
 {
 	std::size_t n = eutf::test_queue.size();
 
@@ -78,90 +73,56 @@ static void RunTests(T& f)
 	}
 }
 
-void eutf::RunAll(std::ofstream& f)
+void eutf::RunAll(int log)
 {
-	RunTests(f);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		RunTests(std::cout);
+		break;
+	}
+	}
 }
 
-void eutf::RunAll(std::ostream& f)
+void eutf::Test::OnFatal(int log, const char* file, int line, const char* callstr)
 {
-	RunTests(f);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ") " << eutf::TestName() << this->m_name << " [FATAL]: " << callstr << std::endl;
+	}
+	}
 }
 
-void eutf::RunAll(std::fstream& f)
-{
-	RunTests(f);
-}
-
-template<typename T>
-static inline void LogType(T& f, const char* type, const std::string& name, const char* file, int line, const char* callstr)
-{
-	f << file << "(" << line << ") " << eutf::TestName() << name << " [" << type << "]: " << callstr << std::endl;
-}
-
-void eutf::Test::OnFatal(std::ofstream& f, const char* file, int line, const char* callstr)
-{
-	LogType(f, "FATAL", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnFatal(std::ostream& f, const char* file, int line, const char* callstr)
-{
-	LogType(f, "FATAL", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnFatal(std::fstream& f, const char* file, int line, const char* callstr)
-{
-	LogType(f, "FATAL", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnFailure(std::ofstream& f, const char* file, int line, const char* callstr)
+void eutf::Test::OnFailure(int log, const char* file, int line, const char* callstr)
 {
 	++errors;
-	LogType(f, "FAILURE", this->m_name, file, line, callstr);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ")" << eutf::TestName() << this->m_name << " [FAILURE]: " << callstr << std::endl;
+	}
+	}
 }
 
-void eutf::Test::OnFailure(std::ostream& f, const char* file, int line, const char* callstr)
-{
-	++errors;
-	LogType(f, "FAILURE", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnFailure(std::fstream& f, const char* file, int line, const char* callstr)
-{
-	++errors;
-	LogType(f, "FAILURE", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnWarning(std::ofstream& f, const char* file, int line, const char* callstr)
+void eutf::Test::OnWarning(int log, const char* file, int line, const char* callstr)
 {
 	++warnings;
-	LogType(f, "WARINING", this->m_name, file, line, callstr);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ")" << eutf::TestName() << this->m_name << " [WARNING]: " << callstr << std::endl;		
+        }
+	}
 }
 
-void eutf::Test::OnWarning(std::ostream& f, const char* file, int line, const char* callstr)
+void eutf::Test::OnMessage(int log, const char* file, int line, const char* msg)
 {
-	++warnings;
-	LogType(f, "WARINING", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnWarning(std::fstream& f, const char* file, int line, const char* callstr)
-{
-	++warnings;
-	LogType(f, "WARINING", this->m_name, file, line, callstr);
-}
-
-void eutf::Test::OnMessage(std::ofstream& f, const char* file, int line, const char* msg)
-{
-	LogType(f, "MESSAGE", this->m_name, file, line, msg);
-}
-
-void eutf::Test::OnMessage(std::ostream& f, const char* file, int line, const char* msg)
-{
-	LogType(f, "MESSAGE", this->m_name, file, line, msg);
-}
-
-void eutf::Test::OnMessage(std::fstream& f, const char* file, int line, const char* msg)
-{
-	LogType(f, "MESSAGE", this->m_name, file, line, msg);
+	switch(log)
+	{
+	case eutf::CONSOLE: {
+		std::cout << file << "(" << line << ")" << eutf::TestName() << this->m_name << " [MESSAGE]: " << msg << std::endl;
+	}
+	}
 }
 
