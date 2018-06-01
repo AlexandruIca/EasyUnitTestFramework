@@ -2,15 +2,13 @@
 #ifndef EUTF_HPP
 #define EUTF_HPP
 
-#include <iostream>
-#include <fstream>
 #include <string>
 
 //
 // * Where to print information regarding tests
 //
 #ifndef EUTF_LOG
-#define EUTF_LOG std::cout
+#define EUTF_LOG eutf::CONSOLE
 #endif
 
 //
@@ -87,19 +85,17 @@ static int EUTF_CONCAT(eutf_test_suite_end_, __LINE__) = []() -> int \
 #define EUTF_RUN_ALL_TESTS() \
 static int EUTF_CONCAT(eutf_tests_results, __LINE__) = []() -> int \
 { \
-	size_t n = eutf::TestsCount(); \
-	\
-	if(n == 1) \
-		EUTF_LOG << "1 test\n\n"; \
-	else \
-		EUTF_LOG << n <<" tests\n\n"; \
-	\
 	eutf::RunAll(EUTF_LOG); \
 	\
 	return 0; \
 }()
 
 namespace eutf {
+	
+	enum Log : int
+	{
+		CONSOLE //, XML in the future
+	};
 
 	struct Test
 	{
@@ -110,35 +106,20 @@ namespace eutf {
 		Test(Test* test, std::string&& name);
 		virtual ~Test();
 
-		virtual void OnFatal(std::ofstream& f, const char* file, int line, const char* callstr);
-		virtual void OnFatal(std::ostream& f, const char* file, int line, const char* callstr);
-		virtual void OnFatal(std::fstream& f, const char* file, int line, const char* callstr);
-
-		virtual void OnFailure(std::ofstream& f, const char* file, int line, const char* callstr);
-		virtual void OnFailure(std::ostream& f, const char* file, int line, const char* callstr);
-		virtual void OnFailure(std::fstream& f, const char* file, int line, const char* callstr);
-
-		virtual void OnWarning(std::ofstream& f, const char* file, int line, const char* callstr);
-		virtual void OnWarning(std::ostream& f, const char* file, int line, const char* callstr);
-		virtual void OnWarning(std::fstream& f, const char* file, int line, const char* callstr);
-
-		virtual void OnMessage(std::ofstream& f, const char* file, int line, const char* msg);
-		virtual void OnMessage(std::ostream& f, const char* file, int line, const char* msg);
-		virtual void OnMessage(std::fstream& f, const char* file, int line, const char* msg);
+		virtual void OnFatal(int log, const char* file, int line, const char* callstr);
+		virtual void OnFailure(int log, const char* file, int line, const char* callstr);
+		virtual void OnWarning(int log, const char* file, int line, const char* callstr);
+		virtual void OnMessage(int log, const char* file, int line, const char* msg);
 	
 	public:
 		virtual void run() = 0;
 	};
 
-	size_t TestsCount();
-
 	std::string TestName();
 	void AddTestName(const char* m_name);
 	void DeleteTestName();
 
-	void RunAll(std::ofstream& f);
-	void RunAll(std::ostream& f);
-	void RunAll(std::fstream& f);
+	void RunAll(int log);
 
 }
 
