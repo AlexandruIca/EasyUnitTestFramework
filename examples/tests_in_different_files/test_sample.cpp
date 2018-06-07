@@ -31,9 +31,9 @@ Vec3::Vec3(Vec3&& other)
 //
 // * Test the vector class right where it's been created
 //
-EUTF_TEST_SUITE(Vec3<->TestSuite)
+EUTF_TEST_SUITE(u8"Vec3 test suite")
 {
-	EUTF_NEW_TEST(default_constructor)
+	EUTF_NEW_TEST(u8"constructor", u8"default")
 	{
 		Vec3 vec{};
 
@@ -42,7 +42,7 @@ EUTF_TEST_SUITE(Vec3<->TestSuite)
 		EUTF_CHECK(vec.z == 0.0);
 	}
 
-	EUTF_NEW_TEST(double_constructor)
+	EUTF_NEW_TEST(u8"constructor", u8"double")
 	{
 		Vec3 vec{ 1.6, 2.3, 4.1 };
 
@@ -52,7 +52,7 @@ EUTF_TEST_SUITE(Vec3<->TestSuite)
 		EUTF_CHECK(vec.x + vec.y == 4.0);
 	}
 
-	EUTF_NEW_TEST(copy_constructor)
+	EUTF_NEW_TEST(u8"constructor", u8"copy")
 	{
 		Vec3 vec_tmp{ 2.0, 3.0, 4.0 };
 		Vec3 vec{ vec_tmp };
@@ -62,11 +62,11 @@ EUTF_TEST_SUITE(Vec3<->TestSuite)
 		EUTF_EXPECT(vec.z == 4.0);
 	}
 
-	EUTF_NEW_TEST(move_constructor)
+	EUTF_NEW_TEST(u8"constructor", u8"move")
 	{
 		Vec3 vec{ Vec3{ 1.0, 2.0, 3.0 } };
 
-		EUTF_MESSAGE("Move constructor");
+		EUTF_MESSAGE(u8"Move constructor");
 		EUTF_CHECK(vec.x + vec.y + vec.z == 6.0);
 	}
 }

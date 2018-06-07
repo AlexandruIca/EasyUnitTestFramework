@@ -1,6 +1,8 @@
-project( Test_In_Different_Files )
+project( Tests_In_Different_Files )
 
-add_executable( Test_In_Different_Files ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/test_sample.cpp ${PROJECT_SOURCE_DIR}/test_sample.hpp ${PROJECT_SOURCE_DIR}/../../src/EUTF.cpp )
+#set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -E" )
 
-target_include_directories( Test_In_Different_Files PRIVATE ${PROJECT_SOURCE_DIR}/../../src/ )
+add_executable( Tests_In_Different_Files ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/test_sample.cpp ${PROJECT_SOURCE_DIR}/test_sample.hpp )
+
+target_include_directories( Tests_In_Different_Files PRIVATE ${PROJECT_SOURCE_DIR}/../../src/ )
 
