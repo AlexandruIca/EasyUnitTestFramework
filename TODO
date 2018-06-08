@@ -1,7 +1,7 @@
-Add sections(tests in tests, preferably nested sections supported)
 Mocking?
 Add CONTRIBUTING and CODE_OF_CONDUCT
 Add .editorconfig
 Add xml output capability(and json)
 Port it to C to make it available to many more compilers(make it as close as possible to the c++ version)
-Bright red text for fatal errors, darker red for failures, blue for warnings, yellow for messages and green text for no failures? 
+Bright red text for fatal errors, darker red for failures, blue for warnings, yellow for messages and green text for no failures?
+Add many more clear examples 
