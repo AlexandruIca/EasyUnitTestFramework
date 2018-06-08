@@ -44,10 +44,10 @@ int main()
 ```
 The output of that should be something like this:
 ```c++
-path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string [FAILURE]: 2 == 3
-path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string [WARNING]: 2 == 3
-path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string [MESSAGE]: this will be printed alongside the output that contains the results of the tests
-path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string [FATAL]: 2 == 3
+path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string} [FAILURE]: 2 == 3
+path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string} [WARNING]: 2 == 3
+path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string} [MESSAGE]: this will be printed alongside the output that contains the results of the tests
+path/to/your/file.cpp(line at which a fatal error/error/warning/message occured) {name of the test is a quoted string} [FATAL]: 2 == 3
 
 Warnings: 1
 Failures: 1
@@ -73,7 +73,7 @@ And the output should be:
 ```c++
 path/to/your/file.cpp(line) name\{test} [FAILURE]: 2 == 3
 ```
-You are not limited to just a name for a test, you can also have as many tags as you want besides the name. Tags are simply a way to differentiate multiple tests with the same name. In fact the name itself is considered a tag. Test suites however only have a name.
+You are not limited to just a name for a test, you can also have as many tags as you want besides the name. Tags are simply a way to differentiate multiple tests with the same name. In fact the name itself is considered a tag. Test suites however only have a name. 
 ```c++
 EUTF_NEW_TEST(u8"the first tag is considered the name of the test", u8"another tag", u8"and another one")
 {
@@ -82,10 +82,34 @@ EUTF_NEW_TEST(u8"the first tag is considered the name of the test", u8"another t
 ```
 And in the output any notification will come up like this:
 ```
-file(line) Test suite name in which the test is put\{the first tag...} {another tag} {and another one} ...
+file(line) Test suite name in which the test is put\{the first tag...} ...
 ```
+You can also define a section which is a test in a test. You can have as many nested sections as you want. To define it:
+```c++
+EUTF_TEST(u8"whatever")
+{
+	EUTF_SECTION(u8"name", u8"tags")
+	{
+		// EUTF_REQUIRE should only be used inside a section
+		// Just like EUTF_EXPECT if it fails it's considered an error
+		EUTF_REQUIRE(2 == 3);
+		// The remaining section won't run, as well as the sub-sections
+		EUTF_SECTION(u8"another section")
+		{
+			// Nothing will run
+		}
+	}
+	// But the remaining test will still run
+}
+```
+The difference between ```EUTF_REQUIRE``` and ```EUTF_EXPECT``` is that the former will exit from the current section, while the latter won't. If you want to exit from the test completely when something fails inside a section use ```EUTF_ASSERT```. Of course, you can still call EUTF_EXPECT/CHECK/MESSAGE inside a section.
 Check examples/ for more.
 # Version Tracker
+v1.2:
+* Refactored the code a bit
+* Added sections
+* Added EUTF_REQUIRE, a helper for sections
+* Solved a dangerous static initialization problem
 
 v1.1:
 * Refactored a lot of the code to make it easier to read and implement xml and json output in the future
