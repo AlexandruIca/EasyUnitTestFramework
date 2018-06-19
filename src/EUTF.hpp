@@ -2,22 +2,6 @@
 #ifndef EUTF_HPP
 #define EUTF_HPP
 
-namespace eutf  {
-	
-	enum Log : int 
-	{
-		CONSOLE // , XML, JSON
-	};
-
-}
-
-//
-// * Where to print information regarding tests
-//
-#ifndef EUTF_LOG
-static constexpr int EUTF_LOG = eutf::CONSOLE;
-#endif
-
 //
 // * Helpers for declaring uniquely-named variables/structs 
 //
@@ -47,7 +31,7 @@ void EUTF_CONCAT(EUTF_Test_, __LINE__)::run()
 //
 // * Can have as many tags as you want
 //
-// * Infinitely nested sections are supported
+// * "Infinitely" nested sections are supported
 //
 #define EUTF_SECTION(...) \
 this->AddSectionTags({ __VA_ARGS__ }); \
@@ -60,7 +44,7 @@ for(int EUTF_CONCAT(eutf_index_, __LINE__) = 0; EUTF_CONCAT(eutf_index_, __LINE_
 #define EUTF_ASSERT(P) \
 if(!(P)) \
 { \
-	this->OnFatal(EUTF_LOG, __FILE__, __LINE__, #P); \
+	this->OnFatal(__FILE__, __LINE__, #P); \
 	\
 	this->DeleteAllSectionNames(); \
 	\
@@ -79,7 +63,7 @@ if(!(P)) \
 #define EUTF_REQUIRE(P) \
 if(!(P)) \
 { \
-	this->OnRequire(EUTF_LOG, __FILE__, __LINE__, #P); \
+	this->OnRequire(__FILE__, __LINE__, #P); \
 	\
 	this->DeleteLastSectionName(); \
 	\
@@ -91,16 +75,16 @@ if(!(P)) \
 //
 #define EUTF_EXPECT(P) \
 if(!(P)) \
-	this->OnFailure(EUTF_LOG, __FILE__, __LINE__, #P)
+	this->OnFailure(__FILE__, __LINE__, #P)
 
 //
 // * If this fails it's considered a warning
 //
 #define EUTF_CHECK(P) \
 if(!(P)) \
-	this->OnWarning(EUTF_LOG, __FILE__, __LINE__, #P)
+	this->OnWarning(__FILE__, __LINE__, #P)
 
-#define EUTF_MESSAGE(msg) this->OnMessage(EUTF_LOG, __FILE__, __LINE__, msg)
+#define EUTF_MESSAGE(msg) this->OnMessage(__FILE__, __LINE__, msg)
 
 //
 // * 'name' has to be a quoted string
@@ -130,7 +114,7 @@ static int EUTF_CONCAT(eutf_test_suite_end_, __LINE__) = []() -> int \
 #define EUTF_RUN_ALL_TESTS() \
 static int EUTF_CONCAT(eutf_tests_results, __LINE__) = []() -> int \
 { \
-	eutf::RunAll(EUTF_LOG); \
+	eutf::RunAll(); \
 	\
 	return 0; \
 }()
@@ -147,16 +131,16 @@ namespace eutf {
 		std::list<const char*> m_tags;
 		std::list<const char*> m_section_names;
 		std::list<const char*> m_section_tags;
-		
+				
 		Test() = delete;
 		Test(std::string&& suite, std::list<const char*>&& tags);
 		virtual ~Test();
 
-		void OnFatal(int log, const char* file, int line, const char* callstr);
-		void OnRequire(int log, const char* file, int line, const char* callstr);
-		void OnFailure(int log, const char* file, int line, const char* callstr);
-		void OnWarning(int log, const char* file, int line, const char* callstr);
-		void OnMessage(int log, const char* file, int line, const char* msg);
+		void OnFatal(const char* file, int line, const char* callstr);
+		void OnRequire(const char* file, int line, const char* callstr);
+		void OnFailure(const char* file, int line, const char* callstr);
+		void OnWarning(const char* file, int line, const char* callstr);
+		void OnMessage(const char* file, int line, const char* msg);
 
 		void AddSectionTags(std::list<const char*>&& tags);
 		void DeleteLastSectionName();
@@ -170,11 +154,22 @@ namespace eutf {
 	void AddTestSuiteName(const char* m_name);
 	void DeleteTestSuiteName();
 
-	void RunAll(int log);
+	void RunAll();
 
 }
 
 #ifdef EUTF_MAIN
+
+#ifndef EUTF_LOG
+#define EUTF_LOG eutf::CONSOLE
+#endif
+
+namespace eutf {
+	enum Log
+	{
+		CONSOLE //, XML, JSON	
+	};
+}
 
 #include <iostream>
 #include <vector>
@@ -264,11 +259,13 @@ static void RunTests(std::ostream& f)
 	else {
 		f << "***No fatal errors";
 	}
+
+	std::cout << std::endl;
 }
 
-void eutf::RunAll(int log)
+void eutf::RunAll()
 {
-	switch (log)
+	switch (EUTF_LOG)
 	{
 	case eutf::CONSOLE: {
 		RunTests(std::cout);
@@ -277,14 +274,16 @@ void eutf::RunAll(int log)
 	}
 }
 
-static void PrintInfo(int log, const std::string& name, const std::list<const char*>& tags, const char* type, const char* file, int line, const char* str, const std::list<const char*> section_names = std::list<const char*>{})
+static void PrintInfo(int log, const std::string& name, const std::list<const char*>& tags, 
+		      const char* type, const char* file, int line, const char* str, 
+		      const std::list<const char*> section_names = std::list<const char*>{})
 {
 	switch (log)
 	{
 	case eutf::CONSOLE: {
 		std::cout << file << "(" << line << ") " << name;
 
-		std::cout << "{" << tags.front() << "}";
+		std::cout << tags.front();
 
 		for(const auto& section_name : section_names)
 			std::cout << "." << section_name;
@@ -294,33 +293,33 @@ static void PrintInfo(int log, const std::string& name, const std::list<const ch
 	}
 }
 
-void eutf::Test::OnFatal(int log, const char* file, int line, const char* callstr)
+void eutf::Test::OnFatal(const char* file, int line, const char* callstr)
 {
 	++fatal_errors;
-	PrintInfo(log, this->m_suite, this->m_tags, "FATAL", file, line, callstr, this->m_section_names);
+	PrintInfo(EUTF_LOG, this->m_suite, this->m_tags, "FATAL", file, line, callstr, this->m_section_names);
 }
 
-void eutf::Test::OnRequire(int log, const char* file, int line, const char* callstr)
+void eutf::Test::OnRequire(const char* file, int line, const char* callstr)
 {
 	++errors;
-	PrintInfo(log, this->m_suite, this->m_tags, "FAILURE", file, line, callstr, this->m_section_names);
+	PrintInfo(EUTF_LOG, this->m_suite, this->m_tags, "FAILURE", file, line, callstr, this->m_section_names);
 }
 
-void eutf::Test::OnFailure(int log, const char* file, int line, const char* callstr)
+void eutf::Test::OnFailure(const char* file, int line, const char* callstr)
 {
 	++errors;
-	PrintInfo(log, this->m_suite, this->m_tags, "FAILURE", file, line, callstr, this->m_section_names);
+	PrintInfo(EUTF_LOG, this->m_suite, this->m_tags, "FAILURE", file, line, callstr, this->m_section_names);
 }
 
-void eutf::Test::OnWarning(int log, const char* file, int line, const char* callstr)
+void eutf::Test::OnWarning(const char* file, int line, const char* callstr)
 {
 	++warnings;
-	PrintInfo(log, this->m_suite, this->m_tags, "WARNING", file, line, callstr, this->m_section_names);
+	PrintInfo(EUTF_LOG, this->m_suite, this->m_tags, "WARNING", file, line, callstr, this->m_section_names);
 }
 
-void eutf::Test::OnMessage(int log, const char* file, int line, const char* msg)
+void eutf::Test::OnMessage(const char* file, int line, const char* msg)
 {
-	PrintInfo(log, this->m_suite, this->m_tags, "MESSAGE", file, line, msg, this->m_section_names);
+	PrintInfo(EUTF_LOG, this->m_suite, this->m_tags, "MESSAGE", file, line, msg, this->m_section_names);
 }
 
 void eutf::Test::AddSectionTags(std::list<const char*>&& tags)
