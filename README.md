@@ -1,5 +1,5 @@
 # EasyUnitTestFramework
-An easy to use unit testing framework for C++0x.
+An easy to use unit testing framework for C++11.
 It's a very flexible framework, easy to set up and shouldn't increase compile times by too much.
 # Setup
 This framework uses CMake as its build system. You only have to include ```${EUTF_INCLUDE_DIR}``` in your search path. Make sure to set ```EUTF_BUILD_TESTS``` off if you don't want to build the examples.
