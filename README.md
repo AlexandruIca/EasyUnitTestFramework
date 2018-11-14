@@ -12,7 +12,7 @@ Tests should be created in .cpp files:
 // default place to print test results is the console
 #include "EUTF.hpp"
 
-EUTF_NEW_TEST(u8"name of the test is a quoted string")
+EUTF_NEW_TEST("name of the test is a quoted string")
 {
 	// test something
 	EUTF_EXPECT(2 == 3); // will give an error
@@ -103,5 +103,5 @@ EUTF_TEST(u8"whatever")
 }
 ```
 The difference between ```EUTF_REQUIRE``` and ```EUTF_EXPECT``` is that the former will exit from the current section, while the latter won't. If you want to exit from the test completely when something fails inside a section use ```EUTF_ASSERT```. Of course, you can still call EUTF_EXPECT/CHECK/MESSAGE inside a section.
-Check examples/ for more.
+Check examples/ and docs/ for more.
  
