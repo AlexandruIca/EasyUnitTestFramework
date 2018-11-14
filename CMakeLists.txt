@@ -2,8 +2,8 @@ cmake_minimum_required( VERSION 3.5 )
 
 project( EUTF VERSION 1.4 )
 
-set( EUTF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/ )
-set( EUTF_HEADER ${PROJECT_SOURCE_DIR}/src/EUTF.hpp )
+set( EUTF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/ )
+set( EUTF_HEADER ${EUTF_INCLUDE_DIR}/EUTF.hpp )
 
 set( EUTF_BUILD_TESTS ON )
 
